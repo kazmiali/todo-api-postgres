@@ -1,43 +1,19 @@
 import { Router } from 'express';
+import {
+	addTodo,
+	deleteTodo,
+	getTodos,
+	updateTodo,
+} from '../controllers/todos.mjs';
 
 const todosRouter = Router();
-const todos = [];
 
-todosRouter.get('/', (req, res) => {
-	res.json({ message: 'List of todos.', data: todos });
-});
+todosRouter.get('/', getTodos);
 
-todosRouter.post('/', (req, res) => {
-	const { title } = req.body;
-	const todo = { title: title, id: Date.now(), isDone: false };
-	todos.push(todo);
-	res.status(201).json({ message: 'Todo Created.', data: todo });
-});
+todosRouter.post('/', addTodo);
 
-todosRouter.put('/', (req, res) => {
-	const { id, title } = req.body;
-	console.log('id', id);
-	console.log('title', title);
-	console.log('todos', todos);
+todosRouter.put('/:id', updateTodo);
 
-	if (!Number(id)) {
-		res.status(500).json({ message: 'ERROR' });
-	}
-
-	let todo = todos.filter(todo => Number(todo.id) === Number(id));
-	if (todo?.length) {
-		todo = todo[0];
-	}
-	console.log('todo', todo);
-	todo.title = title;
-	res.status(200).json({ message: 'Todo Updated.', data: todo });
-});
-
-todosRouter.delete('/', (req, res) => {
-	const { title } = req.body;
-	const todo = { title };
-	todos.push(todo);
-	res.status(201).json({ message: 'Todo Created.', data: todo });
-});
+todosRouter.delete('/:id', deleteTodo);
 
 export default todosRouter;
