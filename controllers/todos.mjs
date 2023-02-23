@@ -1,26 +1,27 @@
 import { pool } from '../db.cjs';
+import { convertStringToBool } from '../utils/helper.mjs';
 
 export async function getTodos(req, res) {
 	try {
-		const response = await pool.query('SELECT * FROM shark');
+		const response = await pool.query('SELECT * FROM todos');
 		console.log('response', response);
 		console.log(response.rows);
-		res.json({ message: 'List of sharks.', data: response.rows });
+		res.json({ message: 'List of todos.', data: response.rows });
 	} catch (error) {
 		console.error(error);
 	}
 }
 
 export async function addTodo(req, res) {
-	const { name, color } = req.body;
+	const { title, isDone } = req.body;
 	try {
 		const response = await pool.query(
-			'INSERT INTO shark (name, color) VALUES ($1, $2)',
-			[name, color],
+			'INSERT INTO todos (title, isDone) VALUES ($1, $2)',
+			[title, convertStringToBool(isDone)],
 		);
 		console.log('response', response);
-		console.log(`Added a shark with the name ${name}`);
-		res.status(201).json({ message: 'Shark Added.' });
+		console.log(`Added a todo with the title ${title}`);
+		res.status(201).json({ message: 'Todo Added.' });
 	} catch (error) {
 		console.error(error);
 		res.status(500).json({ message: 'Error.' });
