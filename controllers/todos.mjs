@@ -34,24 +34,24 @@ export async function updateTodo(req, res) {
 		return;
 	}
 
-	if (!req || !req.body || !req.body.name) {
+	if (!req || !req.body || !req.body.title) {
 		res.status(404).json({ error: 'invalid data sent' });
 		return;
 	}
 
 	const id = req.params.id;
 
-	const { name } = req.body;
+	const { title } = req.body;
 
 	try {
 		const response = await pool.query(
-			'UPDATE shark SET name = $1 WHERE id = $2',
-			[name, id],
+			'UPDATE todos SET title = $1 WHERE todo_id = $2',
+			[title, id],
 		);
 
 		console.log('response', response);
-		console.log(`Updated the shark name to ${name}`);
-		res.status(200).json({ message: `Updated the shark name to ${name}` });
+		console.log(`Updated the shark title to ${title}`);
+		res.status(200).json({ message: `Updated the shark title to ${title}` });
 	} catch (error) {
 		res.status(500).json({ message: 'Error.' });
 		console.error(error);
@@ -67,10 +67,10 @@ export async function deleteTodo(req, res) {
 	const id = req.params.id;
 
 	try {
-		const response = await pool.query('DELETE from shark WHERE id = $1', [id]);
+		const response = await pool.query('DELETE from todos WHERE todo_id = $1', [id]);
 
 		console.log('response', response);
-		res.status(201).json({ message: 'shark Deleted.' });
+		res.status(201).json({ message: 'todo Deleted.' });
 	} catch (error) {
 		res.status(500).json({ message: 'Error.' });
 		console.error(error);
