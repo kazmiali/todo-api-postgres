@@ -57,6 +57,7 @@ export async function updateTodo(req, res) {
 		console.log(`Updated the shark name to ${name}`);
 		res.status(200).json({ message: `Updated the shark name to ${name}` });
 	} catch (error) {
+		res.status(500).json({ message: 'Error.' });
 		console.error(error);
 	}
 
@@ -70,7 +71,7 @@ export async function updateTodo(req, res) {
 	// todo.name = name;
 }
 
-export function deleteTodo(req, res) {
+export async function deleteTodo(req, res) {
 	if (!req.params.id && !Number(req.params.id)) {
 		res.status(404).json({ error: 'id not provided' });
 		return;
@@ -78,12 +79,21 @@ export function deleteTodo(req, res) {
 
 	const id = req.params.id;
 
-	const todo = todos.filter(todo => Number(todo.id) === Number(id));
-	if (!todo?.length) {
-		res.status(404).json({ error: `Todo with this id ${id} does not exist` });
-		return;
+	try {
+		const response = await pool.query('DELETE from shark WHERE id = $1', [id]);
+
+		console.log('response', response);
+		res.status(201).json({ message: 'shark Deleted.' });
+	} catch (error) {
+		res.status(500).json({ message: 'Error.' });
+		console.error(error);
 	}
 
-	todos = todos.filter(todo => Number(todo.id) !== Number(id));
-	res.status(201).json({ message: 'Todo Deleted.', data: todos });
+	// const todo = todos.filter(todo => Number(todo.id) === Number(id));
+	// if (!todo?.length) {
+	// 	res.status(404).json({ error: `Todo with this id ${id} does not exist` });
+	// 	return;
+	// }
+
+	// todos = todos.filter(todo => Number(todo.id) !== Number(id));
 }
