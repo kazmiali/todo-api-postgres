@@ -1,40 +1,73 @@
+import { pool } from '../db.cjs';
+
 let todos = [];
 
-export function getTodos(req, res) {
-	res.json({ message: 'List of todos.', data: todos });
+export async function getTodos(req, res) {
+	// res.json({ message: 'List of todos.', data: todos });
+	//
+	try {
+		const response = await pool.query('SELECT * FROM shark');
+		console.log('response', response);
+		console.log(response.rows);
+		res.json({ message: 'List of sharks.', data: response.rows });
+	} catch (error) {
+		console.error(error);
+	}
 }
 
-export function addTodo(req, res) {
-	const { title } = req.body;
-	const todo = { title: title, id: Date.now(), isDone: false };
-	todos.push(todo);
-	res.status(201).json({ message: 'Todo Created.', data: todo });
+export async function addTodo(req, res) {
+	const { name, color } = req.body;
+	//
+	try {
+		const response = await pool.query(
+			'INSERT INTO shark (name, color) VALUES ($1, $2)',
+			[name, color],
+		);
+		console.log('response', response);
+		console.log(`Added a shark with the name ${name}`);
+		res.status(201).json({ message: 'Shark Added.' });
+	} catch (error) {
+		console.error(error);
+		res.status(500).json({ message: 'Error.' });
+	}
 }
 
-export function updateTodo(req, res) {
+export async function updateTodo(req, res) {
 	if (!req.params.id && !Number(req.params.id)) {
 		res.status(404).json({ error: 'id not provided' });
 		return;
 	}
 
-	if (!req || !req.body || !req.body.title) {
+	if (!req || !req.body || !req.body.name) {
 		res.status(404).json({ error: 'invalid data sent' });
 		return;
 	}
 
 	const id = req.params.id;
 
-	const { title } = req.body;
+	const { name } = req.body;
 
-	let todo = todos.filter(todo => Number(todo.id) === Number(id));
-	if (todo?.length) {
-		todo = todo[0];
-	} else {
-		res.status(404).json({ error: `Todo with this id ${id} does not exist` });
-		return;
+	try {
+		const response = await pool.query(
+			'UPDATE shark SET name = $1 WHERE id = $2',
+			[name, id],
+		);
+
+		console.log('response', response);
+		console.log(`Updated the shark name to ${name}`);
+		res.status(200).json({ message: `Updated the shark name to ${name}` });
+	} catch (error) {
+		console.error(error);
 	}
-	todo.title = title;
-	res.status(200).json({ message: 'Todo Updated.', data: todo });
+
+	// let todo = todos.filter(todo => Number(todo.id) === Number(id));
+	// if (todo?.length) {
+	// 	todo = todo[0];
+	// } else {
+	// 	res.status(404).json({ error: `Todo with this id ${id} does not exist` });
+	// 	return;
+	// }
+	// todo.name = name;
 }
 
 export function deleteTodo(req, res) {
