@@ -1,10 +1,6 @@
 import { pool } from '../db.cjs';
 
-let todos = [];
-
 export async function getTodos(req, res) {
-	// res.json({ message: 'List of todos.', data: todos });
-	//
 	try {
 		const response = await pool.query('SELECT * FROM shark');
 		console.log('response', response);
@@ -17,7 +13,6 @@ export async function getTodos(req, res) {
 
 export async function addTodo(req, res) {
 	const { name, color } = req.body;
-	//
 	try {
 		const response = await pool.query(
 			'INSERT INTO shark (name, color) VALUES ($1, $2)',
@@ -60,15 +55,6 @@ export async function updateTodo(req, res) {
 		res.status(500).json({ message: 'Error.' });
 		console.error(error);
 	}
-
-	// let todo = todos.filter(todo => Number(todo.id) === Number(id));
-	// if (todo?.length) {
-	// 	todo = todo[0];
-	// } else {
-	// 	res.status(404).json({ error: `Todo with this id ${id} does not exist` });
-	// 	return;
-	// }
-	// todo.name = name;
 }
 
 export async function deleteTodo(req, res) {
@@ -88,12 +74,4 @@ export async function deleteTodo(req, res) {
 		res.status(500).json({ message: 'Error.' });
 		console.error(error);
 	}
-
-	// const todo = todos.filter(todo => Number(todo.id) === Number(id));
-	// if (!todo?.length) {
-	// 	res.status(404).json({ error: `Todo with this id ${id} does not exist` });
-	// 	return;
-	// }
-
-	// todos = todos.filter(todo => Number(todo.id) !== Number(id));
 }
